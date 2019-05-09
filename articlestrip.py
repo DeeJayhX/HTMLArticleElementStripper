@@ -11,7 +11,7 @@
 
 import os, time
 
-version = 1.0
+version = "1.0.1"
 sTime = time.time()
 filesFound = filesStripped = articles = 0
 
@@ -22,11 +22,16 @@ for root, directories, filenames in os.walk(os.getcwd()):
         stripped = []
         filesFound += 1
         if file == "index.html":
-            print(f"Found {file}. Opening... ", end="")
+            print(f"Found {root}/{file}. Opening... ", end="")
             filesStripped += 1
-            with open(f'{root}/index.html', encoding="utf8") as f:
+            with open(f'{root}/{file}', encoding="utf8") as f:
                 print("Done.")
-                line = f.readline()
+                try:
+                    line = f.readline()
+                except Exception as e:
+                    print(f"Unable to read {root}/{file}. {str(e).split(': ')[1].capitalize()}. "\
+                          f"Likely a corrupt/invalid file. Skipping.")
+                    break
                 insidearticle = False
                 while line:
                     line = f.readline()
@@ -41,12 +46,12 @@ for root, directories, filenames in os.walk(os.getcwd()):
                         stripped.append("    " + line.strip())
                     else:
                         pass
-                print(f"{file} stripped.")
+                print(f"{root}/{file} stripped.")
 
             if len(stripped) <= 0:
-                print(f"No article elements inside {file}. Skipping... ", end="")
+                print(f"No article elements inside {root}/{file}. Skipping... ", end="")
             else:
-                print(f"Writing to {file.split('.')[0]}.md... ", end="")
+                print(f"Writing articles to {root}/{file.split('.')[0]}.md... ", end="")
                 with open(f'{root}/index.md', 'w') as f:
                     for line in stripped:
                         f.writelines(line + "\n")
