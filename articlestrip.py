@@ -11,7 +11,7 @@
 
 import os, time
 
-version = "1.0.1"
+version = "1.0.2"
 sTime = time.time()
 filesFound = filesStripped = articles = 0
 
@@ -31,6 +31,7 @@ for root, directories, filenames in os.walk(os.getcwd()):
                 except Exception as e:
                     print(f"Unable to read {root}/{file}. {str(e).split(': ')[1].capitalize()}. "\
                           f"Likely a corrupt/invalid file. Skipping.")
+                    print("---")
                     break
                 insidearticle = False
                 while line:
