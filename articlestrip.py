@@ -1,4 +1,3 @@
-#!/usr/bin/python3.6
 ### HTML Article Element Stripper
 #
 ### Written by: DeeJayh
@@ -10,36 +9,55 @@
 #
 ### Released under the MIT License
 
-import os
+import os, time
 
+version = 1.0
+sTime = time.time()
+filesFound = filesStripped = articles = 0
+
+print(f"--HTML Article Element Stripper v{version}--")
+print("Recursively scanning current directory and all subdirectories...")
 for root, directories, filenames in os.walk(os.getcwd()):
-    for dir in directories:
-        dir = dir
     for file in filenames:
         stripped = []
+        filesFound += 1
         if file == "index.html":
-            print(f"Found {file}. Opening.")
+            print(f"Found {file}. Opening... ", end="")
+            filesStripped += 1
             with open(f'{root}/index.html', encoding="utf8") as f:
+                print("Done.")
                 line = f.readline()
                 insidearticle = False
                 while line:
                     line = f.readline()
                     if line.strip().startswith("<article"):
-                        stripped.append(line)
+                        stripped.append(line.strip())
                         insidearticle = True
+                        articles += 1
                     elif line.strip().startswith("</article"):
-                        stripped.append(line)
+                        stripped.append(line.strip() + "\n")
                         insidearticle = False
                     elif insidearticle == True:
-                        stripped.append(line)
+                        stripped.append("    " + line.strip())
                     else:
                         pass
-                print(f"{file} stripped. Writing to Index.md.")
+                print(f"{file} stripped.")
 
-            with open(f'{root}/index.md', 'w') as f:
-                for line in stripped:
-                    f.writelines(line)
-            print("Index.md complete.")
+            if len(stripped) <= 0:
+                print(f"No article elements inside {file}. Skipping... ", end="")
+            else:
+                print(f"Writing to {file.split('.')[0]}.md... ", end="")
+                with open(f'{root}/index.md', 'w') as f:
+                    for line in stripped:
+                        f.writelines(line + "\n")
+            print("Done.")
+            print("---")
 
-
+fTime = time.time()
+print("All tasks complete.")
+print(f"Found {filesStripped} matching {'file' if filesStripped == 1 else 'files'} "\
+      f"out of {filesFound} {'file' if filesFound == 1 else 'files'}.")
+print(f"Stripped {articles} {'article' if articles == 1 else 'articles'} from "\
+      f"{filesStripped} {'file' if filesStripped == 1 else 'files'}.")
+print(f"Total execution time: {fTime - sTime:.2f} seconds.")
 exit(0)
